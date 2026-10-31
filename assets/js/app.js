@@ -13,7 +13,7 @@
       '</h3><p><span>' + esc(x.category || x.contentType) + '</span><span>' + fmt(x.publishedAt) + "</span></p></div></a>";
   }
   window.WEH_UTIL = { $: $, $$: $$, esc: esc, fmt: fmt, safeImg: safeImg, card: card };
-  var EMPTY = '<p class="empty">Belum ada konten yang cocok. Tambahkan resource lewat <code>content-manager.html</code>, lalu ekspor <code>contents.json</code>.</p>';
+  var EMPTY = '<p class="empty">Belum ada resource yang cocok. Silakan kembali lagi nanti untuk melihat koleksi terbaru.</p>';
   function grid(el, items, msg) { if (el) el.innerHTML = items.length ? items.map(card).join("") : (msg || EMPTY); }
 
   function ads() {
@@ -34,7 +34,7 @@
   function common() {
     $$("[data-cfg]").forEach(function (e) {
       var k = e.dataset.cfg;
-      e.textContent = k === "year" ? new Date().getFullYear() : k === "email" ? (C.contact.email || "belum diatur") : (C[k] || "");
+      e.textContent = k === "year" ? new Date().getFullYear() : k === "email" ? (C.contact.email || "Email kontak belum tersedia.") : (C[k] || "");
     });
     var p = location.pathname.split("/").pop() || "index.html";
     var b = $(".burger"), nav = $("#nav");

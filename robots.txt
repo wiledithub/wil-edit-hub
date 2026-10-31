@@ -2,5 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /content-manager.html
 
-# Ganti dengan domain asli setelah publish:
-Sitemap: https://USERNAME.github.io/wil-edit-hub/sitemap.xml
+Sitemap: https://wiledithub.github.io/wil-edit-hub/sitemap.xml
