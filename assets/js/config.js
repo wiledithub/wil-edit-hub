@@ -6,8 +6,11 @@ window.WEH_CONFIG = {
   logo: "assets/icons/favicon.svg",
   favicon: "assets/icons/favicon.svg",
   domain: "https://wiledithub.github.io/wil-edit-hub", // tanpa slash di akhir
-  contact: { email: "" },
-  socials: [], // contoh: [{ name: "Instagram", url: "https://instagram.com/akunmu" }]
+  contact: { email: "wilfocus23@gmail.com" },
+  socials: [
+    { name: "TikTok", url: "https://www.tiktok.com/@its_me_wil23" },
+    { name: "YouTube", url: "https://www.youtube.com/@wilfocus3155" }
+  ],
   ads: { enabled: false, client: "", slots: { inContent: "" } }, // client: "ca-pub-XXXXXXXXXXXXXXXX"
   perPage: 12,
   softwares: ["Alight Motion", "After Effects", "CapCut", "Other"],

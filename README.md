@@ -26,7 +26,7 @@ Buka `http://localhost:8000/`.
 4. Periksa website dan lakukan hard refresh (`Ctrl + F5`) jika masih terlihat versi lama.
 
 ## Pengaturan yang perlu dilengkapi pemilik
-- `assets/js/config.js`: periksa `domain`; isi alamat email kontak dan akun media sosial yang benar-benar aktif.
+- `assets/js/config.js`: domain sudah diatur dan email kontak sudah diisi (`wilfocus23@gmail.com`); akun TikTok dan YouTube sudah diatur; Instagram dapat ditambahkan nanti.
 - `data/contents.json`: tambahkan konten milik sendiri atau konten yang izin distribusinya jelas.
 - `robots.txt` dan `sitemap.xml`: saat ini memakai URL GitHub Pages `https://wiledithub.github.io/wil-edit-hub`.
 - AdSense: tetap nonaktif sampai akun dan unit iklan benar-benar tersedia. Isi `ads.client`, `ads.slots.inContent`, dan `ads.txt` hanya dengan ID resmi dari akun AdSense. Jangan gunakan ID contoh.
