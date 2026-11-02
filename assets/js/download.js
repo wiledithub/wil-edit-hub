@@ -5,6 +5,8 @@
   var D = window.WEH_CONTENT;
   var C = window.WEH_CONFIG;
   var esc = U.esc;
+  var I = window.WEH_I18N || { t: function (k) { return k; }, sw: function (v) { return v; } };
+  var T = I.t;
 
   // Halaman ini tujuan akhir Linkvertise. Tidak ada pencatatan Views/Downloads di sini
   // supaya hitungan di halaman detail tidak ganda.
@@ -30,46 +32,46 @@
 
     if (!x) {
       box.innerHTML =
-        '<p class="empty" style="margin-top:40px">Konten tidak ditemukan atau belum dipublikasikan. ' +
-        '<a href="presets.html">Lihat semua koleksi</a></p>';
-      document.title = "Konten tidak ditemukan | " + C.name;
+        '<p class="empty" style="margin-top:40px">' + T("detail.notFound") + ' ' +
+        '<a href="presets.html">' + T("detail.viewAll") + '</a></p>';
+      document.title = T("detail.notFound") + " | " + C.name;
       return;
     }
 
-    document.title = "Download " + x.title + " | " + C.name;
+    document.title = T("dl.title", { t: x.title }) + " | " + C.name;
 
     var detailUrl = "detail.html?slug=" + encodeURIComponent(x.slug);
     var thumb = U.safeImg(x.thumbnail);
     var extras = x.extraFiles || [];
-    var meta = [x.software, x.fileFormat, x.fileSize].filter(Boolean).join(" \u2022 ");
+    var meta = [I.sw(x.software), x.fileFormat, x.fileSize].filter(Boolean).join(" \u2022 ");
 
     var body;
 
     if (!x.fileUrl && !extras.length) {
       body =
-        '<p class="empty">File untuk konten ini belum tersedia. ' +
-        '<a href="' + detailUrl + '">Kembali ke halaman detail</a></p>';
+        '<p class="empty">' + T("dl.notReady") + ' ' +
+        '<a href="' + detailUrl + '">' + T("dl.backLink") + '</a></p>';
     } else {
       body =
         (x.fileUrl
-          ? '<div class="dl-group"><h2>File utama</h2><div class="dl-list">' +
-              fileButton(x.fileUrl, "Download file utama", false) +
+          ? '<div class="dl-group"><h2>' + T("dl.main") + '</h2><div class="dl-list">' +
+              fileButton(x.fileUrl, T("dl.mainBtn"), false) +
             '</div></div>'
           : "") +
         (extras.length
-          ? '<div class="dl-group"><h2>File tambahan</h2><div class="dl-list">' +
+          ? '<div class="dl-group"><h2>' + T("dl.extra") + '</h2><div class="dl-list">' +
               extras.map(function (f) {
                 return fileButton(f.url, f.name, true);
               }).join("") +
             '</div></div>'
           : "") +
-        '<p class="dl-note">Setiap file terbuka di tab baru. Jika tidak terbuka, izinkan pop-up untuk situs ini.</p>';
+        '<p class="dl-note">' + T("dl.note") + '</p>';
     }
 
     box.innerHTML =
       '<nav class="crumbs">' +
-        '<a href="index.html">Home</a> / ' +
-        '<a href="' + detailUrl + '">' + esc(x.title) + '</a> / Download' +
+        '<a href="index.html">' + T("dl.crumbHome") + '</a> / ' +
+        '<a href="' + detailUrl + '">' + esc(x.title) + '</a> / ' + T("dl.crumb") +
       '</nav>' +
       '<div class="dl-card">' +
         '<div class="dl-head">' +
@@ -82,7 +84,7 @@
           '</div>' +
         '</div>' +
         body +
-        '<a class="dl-back" href="' + detailUrl + '">&larr; Kembali ke halaman detail</a>' +
+        '<a class="dl-back" href="' + detailUrl + '">&larr; ' + T("dl.back") + '</a>' +
       '</div>';
   }
 

@@ -16,7 +16,8 @@
       if (!f || typeof f !== "object") return;
       var url = httpUrl(f.url);
       if (!url) return; // tautan tidak valid tidak ditampilkan
-      out.push({ name: text(f.name) || "File tambahan " + (out.length + 1), url: url });
+      var I = window.WEH_I18N;
+      out.push({ name: text(f.name) || (I ? I.t("dl.extraDefault", { n: out.length + 1 }) : "File tambahan " + (out.length + 1)), url: url });
     });
     return out;
   }
@@ -32,6 +33,11 @@
       x.tags = x.tags || []; x.previewImages = x.previewImages || [];
       x.previewUrl = httpUrl(x.previewUrl);
       x.fileUrl = httpUrl(x.fileUrl);
+      // Link download kedua (opsional) dan nama tombolnya. Konten lama tanpa field ini tetap valid.
+      x.downloadUrl = httpUrl(x.downloadUrl);
+      x.downloadUrl2 = httpUrl(x.downloadUrl2);
+      x.downloadLabel = text(x.downloadLabel);
+      x.downloadLabel2 = text(x.downloadLabel2);
       x.fileFormat = text(x.fileFormat);
       x.fileSize = text(x.fileSize);
       x.extraFiles = extraFiles(x.extraFiles);

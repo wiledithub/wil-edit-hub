@@ -4,6 +4,8 @@
   var D = window.WEH_CONTENT;
   var C = window.WEH_CONFIG;
   var esc = U.esc;
+  var I = window.WEH_I18N || { t: function (k) { return k; }, sw: function (v) { return v; }, ctype: function (v) { return v; }, locale: function () { return "id-ID"; } };
+  var T = I.t;
 
   function toast(m) {
     var t = document.createElement("div");
@@ -127,10 +129,10 @@
     o.setAttribute("aria-modal", "true");
 
     o.innerHTML =
-      '<button class="lb-x" aria-label="Tutup">&times;</button>' +
-      '<button class="lb-p" aria-label="Sebelumnya">&#8249;</button>' +
+      '<button class="lb-x" aria-label="' + T("lb.close") + '">&times;</button>' +
+      '<button class="lb-p" aria-label="' + T("lb.prev") + '">&#8249;</button>' +
       '<img alt="">' +
-      '<button class="lb-n" aria-label="Berikutnya">&#8250;</button>' +
+      '<button class="lb-n" aria-label="' + T("lb.next") + '">&#8250;</button>' +
       '<span class="lb-c"></span>';
 
     var im = o.querySelector("img");
@@ -243,16 +245,16 @@
     if (!list.length) return "";
 
     return '<section class="creator" aria-labelledby="creator-title">' +
-      '<div class="sec-head"><h2 id="creator-title">Ikuti Kreator</h2></div>' +
+      '<div class="sec-head"><h2 id="creator-title">' + T("detail.creator") + '</h2></div>' +
       '<div class="social-grid">' +
       list.map(function (s) {
         var key = socialKey(s);
-        var name = s.name || socialHandle(s.url) || "Sosial media";
+        var name = s.name || socialHandle(s.url) || T("detail.social");
         var handle = socialHandle(s.url);
 
         return '<a class="social-link" data-social="' + key + '" href="' + esc(s.url) +
           '" target="_blank" rel="noopener noreferrer" aria-label="' +
-          esc(name) + ' (buka di tab baru)">' +
+          esc(name) + ' (' + T("detail.newTab") + ')">' +
           '<span class="social-ico">' + ICONS[key] + '</span>' +
           '<span class="social-txt"><strong>' + esc(name) + '</strong>' +
           (handle ? '<small>' + esc(handle) + '</small>' : "") +
@@ -277,6 +279,48 @@
       });
   }
 
+  // Nama tombol bawaan per software. Bisa diganti lewat field downloadLabel / downloadLabel2.
+  // Link 2 bersifat opsional: tombol kedua hanya tampil jika downloadUrl2 diisi.
+  var DL_DEFAULT = {
+    "Alight Motion": ["dl.xml", "dl.am5mb"],
+    "After Effects": ["dl.project", "dl.materials"],
+    "CapCut": [null, null],
+    "Other": [null, "dl.materials"]
+  };
+
+  function downloadLinks(x, isTut) {
+    var u1 = httpUrl(x.downloadUrl);
+    var u2 = httpUrl(x.downloadUrl2);
+    var c1 = String(x.downloadLabel || "").trim();
+    var c2 = String(x.downloadLabel2 || "").trim();
+    var def = DL_DEFAULT[x.software] || [null, null];
+    var both = !!(u1 && u2);
+    var single = isTut ? T("detail.openTutorial") : T("detail.download");
+    var list = [];
+
+    if (both) {
+      list.push({ url: u1, label: c1 || (def[0] ? T(def[0]) : (def[1] ? single : T("dl.link", { n: 1 }))) });
+      list.push({ url: u2, label: c2 || (def[1] ? T(def[1]) : T("dl.link", { n: 2 })) });
+    } else if (u1) {
+      list.push({ url: u1, label: c1 || single });
+    } else if (u2) {
+      list.push({ url: u2, label: c2 || single });
+    } else {
+      // Belum ada link: tombol tetap tampil dan memberi tahu pengunjung.
+      list.push({ url: "", label: single });
+    }
+
+    var buttons = list.map(function (d, i) {
+      return '<button class="btn big dl-btn' + (i > 0 ? " dl-btn-2" : "") + '" type="button" data-url="' +
+        esc(d.url) + '">' + ICONS.download + '<span>' + esc(d.label) + '</span></button>';
+    }).join("");
+
+    // Penjelasan singkat perbedaan XML dan 5MB, hanya untuk Alight Motion dengan nama tombol bawaan.
+    var hint = (both && x.software === "Alight Motion" && !c1 && !c2) ? T("dl.amHint") : "";
+
+    return { buttons: buttons, hint: hint };
+  }
+
   // ==========================================
   // RENDER HALAMAN DETAIL
   // ==========================================
@@ -291,10 +335,10 @@
 
     if (!x) {
       box.innerHTML =
-        '<p class="empty">Konten tidak ditemukan atau belum dipublikasikan. ' +
-        '<a href="presets.html">Lihat semua koleksi</a></p>';
+        '<p class="empty">' + T("detail.notFound") + ' ' +
+        '<a href="presets.html">' + T("detail.viewAll") + '</a></p>';
 
-      document.title = "Konten tidak ditemukan | " + C.name;
+      document.title = T("detail.notFound") + " | " + C.name;
       return;
     }
 
@@ -346,15 +390,15 @@
     // Informasi preset: hanya tampilkan data yang terisi
     var rows = "";
 
-    if (x.software) rows += infoRow("Software", esc(x.software));
-    if (x.category) rows += infoRow("Kategori", esc(x.category));
-    if (x.contentType) rows += infoRow("Tipe konten", esc(x.contentType), "cap");
-    if (published) rows += infoRow("Tanggal publikasi", esc(published));
-    if (x.fileFormat) rows += infoRow("Format file", esc(x.fileFormat));
-    if (x.fileSize) rows += infoRow("Ukuran file", esc(x.fileSize));
+    if (x.software) rows += infoRow(T("detail.software"), esc(I.sw(x.software)));
+    if (x.category) rows += infoRow(T("detail.category"), esc(x.category));
+    if (x.contentType) rows += infoRow(T("detail.type"), esc(I.ctype(x.contentType)), "cap");
+    if (published) rows += infoRow(T("detail.date"), esc(published));
+    if (x.fileFormat) rows += infoRow(T("detail.format"), esc(x.fileFormat));
+    if (x.fileSize) rows += infoRow(T("detail.size"), esc(x.fileSize));
 
     var tagsHtml = (x.tags || []).length
-      ? '<div class="info-tags"><span class="info-label">Tag</span>' +
+      ? '<div class="info-tags"><span class="info-label">' + T("detail.tag") + '</span>' +
           '<p class="tags">' +
             x.tags.map(function (t) {
               return '<a href="presets.html?q=' +
@@ -366,11 +410,16 @@
 
     var descParas = descriptionParagraphs(x.description);
 
+    var dl = downloadLinks(x, isTut);
+    var dlButtons = dl.buttons;
+    var dlHint = dl.hint;
+
+
     box.innerHTML =
       '<nav class="crumbs">' +
-        '<a href="index.html">Home</a> / ' +
+        '<a href="index.html">' + T("nav.home") + '</a> / ' +
         '<a href="' + (isTut ? "tutorials" : "presets") + '.html">' +
-          (isTut ? "Tutorials" : "Presets") +
+          (isTut ? T("nav.tutorials") : T("nav.presets")) +
         '</a>' +
       '</nav>' +
 
@@ -379,17 +428,17 @@
         '<div>' +
 
           (imgs[0]
-            ? '<button class="hero-img" data-i="0" aria-label="Perbesar gambar">' +
+            ? '<button class="hero-img" data-i="0" aria-label="' + T("detail.zoom") + '">' +
                 '<img src="' + esc(imgs[0]) + '" alt="' + esc(x.title) + '">' +
               '</button>'
-            : '<div class="hero-img ph">' + esc(x.software) + '</div>'
+            : '<div class="hero-img ph">' + esc(I.sw(x.software)) + '</div>'
           ) +
 
           (imgs.length > 1
             ? '<div class="strip">' +
                 imgs.map(function (s, i) {
-                  return '<button data-i="' + i + '" aria-label="Gambar ' +
-                    (i + 1) + '">' +
+                  return '<button data-i="' + i + '" aria-label="' +
+                    esc(T("detail.image", { n: i + 1 })) + '">' +
                     '<img src="' + esc(s) + '" alt="" loading="lazy">' +
                     '</button>';
                 }).join("") +
@@ -401,38 +450,37 @@
 
         '<div class="info">' +
 
-          '<span class="badge">' + esc(x.software) + '</span>' +
+          '<span class="badge">' + esc(I.sw(x.software)) + '</span>' +
 
           '<h1>' + esc(x.title) + '</h1>' +
 
           '<div class="actions">' +
-            '<button class="btn big" id="dl" type="button">' +
-              ICONS.download +
-              '<span>' + (isTut ? "Buka tutorial" : "Download") + '</span>' +
-            '</button>' +
+            dlButtons +
             (previewUrl
               ? '<a class="btn big btn-preview" id="preview" href="' +
                   esc(previewUrl) + '" target="_blank" rel="noopener noreferrer">' +
-                  ICONS.preview + '<span>Preview</span></a>'
+                  ICONS.preview + '<span>' + T("detail.preview") + '</span></a>'
               : ""
             ) +
           '</div>' +
 
+          (dlHint ? '<p class="hint dl-hint">' + esc(dlHint) + '</p>' : "") +
+
           (extraCount
-            ? '<p class="hint">+ ' + extraCount + ' file tambahan tersedia di halaman download setelah iklan selesai.</p>'
+            ? '<p class="hint">' + esc(T("detail.extraHint", { n: extraCount })) + '</p>'
             : ""
           ) +
 
           '<div class="stats">' +
-            '<div class="stat"><span class="stat-label">Views</span>' +
-              '<strong class="stat-val" id="global-views">Memuat...</strong></div>' +
-            '<div class="stat"><span class="stat-label">Downloads</span>' +
-              '<strong class="stat-val" id="global-downloads">Memuat...</strong></div>' +
+            '<div class="stat"><span class="stat-label">' + T("detail.views") + '</span>' +
+              '<strong class="stat-val" id="global-views">' + T("detail.loading") + '</strong></div>' +
+            '<div class="stat"><span class="stat-label">' + T("detail.downloads") + '</span>' +
+              '<strong class="stat-val" id="global-downloads">' + T("detail.loading") + '</strong></div>' +
           '</div>' +
 
           '<div class="info-panel" role="group" aria-labelledby="info-title">' +
             '<h2 class="panel-title" id="info-title">' +
-              (isTut ? "Informasi Tutorial" : "Informasi Preset") +
+              (isTut ? T("detail.infoTutorial") : T("detail.infoPreset")) +
             '</h2>' +
             '<dl class="info-grid">' + rows + '</dl>' +
             tagsHtml +
@@ -445,13 +493,13 @@
       '<div class="ad-slot" data-slot="inContent" hidden></div>' +
 
       '<section class="prose">' +
-        '<h2>Deskripsi</h2>' +
+        '<h2>' + T("detail.description") + '</h2>' +
 
         (
           descParas.map(function (p) {
             return "<p>" + esc(p) + "</p>";
           }).join("")
-          || "<p>Belum ada deskripsi.</p>"
+          || "<p>" + T("detail.noDescription") + "</p>"
         ) +
 
       '</section>' +
@@ -459,7 +507,7 @@
       creatorSection() +
 
       '<section>' +
-        '<div class="sec-head"><h2>Konten terkait</h2></div>' +
+        '<div class="sec-head"><h2>' + T("detail.related") + '</h2></div>' +
         '<div class="grid" id="related"></div>' +
       '</section>';
 
@@ -473,12 +521,12 @@
 
       if (views) {
         views.textContent =
-          Number(stats.views || 0).toLocaleString("id-ID") + "x";
+          Number(stats.views || 0).toLocaleString(I.locale()) + "x";
       }
 
       if (downloads) {
         downloads.textContent =
-          Number(stats.downloads || 0).toLocaleString("id-ID") + "x";
+          Number(stats.downloads || 0).toLocaleString(I.locale()) + "x";
       }
 
     }).catch(function (error) {
@@ -487,37 +535,41 @@
       var views = document.getElementById("global-views");
       var downloads = document.getElementById("global-downloads");
 
-      if (views) views.textContent = "Tidak tersedia";
-      if (downloads) downloads.textContent = "Tidak tersedia";
+      if (views) views.textContent = T("detail.unavailable");
+      if (downloads) downloads.textContent = T("detail.unavailable");
     });
 
     // ========================================
     // TOMBOL DOWNLOAD
     // ========================================
 
-    var url = (x.downloadUrl || "").trim();
+    // Satu atau dua tombol download. Setiap tombol membuka link-nya sendiri
+    // dan mencatat satu klik download.
+    box.querySelectorAll(".dl-btn").forEach(function (btn) {
+      btn.onclick = function () {
+        var url = btn.getAttribute("data-url") || "";
 
-    document.getElementById("dl").onclick = function () {
-      if (!/^https?:\/\//i.test(url)) {
-        return toast("Link download belum tersedia untuk konten ini.");
-      }
-
-      // Buka link download seperti sebelumnya
-      window.open(url, "_blank", "noopener,noreferrer");
-
-      // Catat klik download ke Supabase
-      addGlobalDownload(x.slug).then(function (total) {
-        var downloads = document.getElementById("global-downloads");
-
-        if (downloads) {
-          downloads.textContent =
-            Number(total || 0).toLocaleString("id-ID") + "x";
+        if (!/^https?:\/\//i.test(url)) {
+          return toast(T("detail.noLink"));
         }
 
-      }).catch(function (error) {
-        console.error("Gagal mencatat download:", error);
-      });
-    };
+        // Buka link download seperti sebelumnya
+        window.open(url, "_blank", "noopener,noreferrer");
+
+        // Catat klik download ke Supabase
+        addGlobalDownload(x.slug).then(function (total) {
+          var downloads = document.getElementById("global-downloads");
+
+          if (downloads) {
+            downloads.textContent =
+              Number(total || 0).toLocaleString(I.locale()) + "x";
+          }
+
+        }).catch(function (error) {
+          console.error("Gagal mencatat download:", error);
+        });
+      };
+    });
 
     // ========================================
     // GALERI GAMBAR
@@ -548,7 +600,7 @@
     document.getElementById("related").innerHTML =
       rel.length
         ? rel.map(U.card).join("")
-        : '<p class="empty">Belum ada konten terkait.</p>';
+        : '<p class="empty">' + T("detail.noRelated") + '</p>';
 
     if (window.WEH_ADS) window.WEH_ADS();
   }
