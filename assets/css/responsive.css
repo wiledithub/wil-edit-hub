@@ -13,3 +13,12 @@
   .hero-search{flex-direction:column}.btn{min-height:46px}.filters{grid-template-columns:1fr}.lb-p,.lb-n{top:auto;bottom:14px}
 }
 @media (max-width:380px){.grid{grid-template-columns:1fr}}
+
+@media (max-width:560px){
+  .actions .btn{flex:1 1 100%}
+  .social-grid{grid-template-columns:1fr}
+  .dl-card{padding:18px}
+  .dl-head{flex-direction:column;align-items:flex-start}
+  .dl-thumb{flex-basis:auto;width:100%;max-width:240px}
+}
+@media (max-width:380px){.info-grid{grid-template-columns:1fr}}
