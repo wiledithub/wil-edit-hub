@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /content-manager.html
 
 Sitemap: https://wiledithub.github.io/wil-edit-hub/sitemap.xml
