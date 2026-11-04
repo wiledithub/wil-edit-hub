@@ -1,6 +1,0 @@
-# ads.txt placeholder.
-# Isi setelah akun AdSense disetujui dan Anda mendapat publisher ID.
-# Format (hapus tanda # dan ganti pub-XXXXXXXXXXXXXXXX dengan ID Anda):
-# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
-# Catatan: di GitHub Pages project repository, file ini harus berada di root domain agar terbaca.
-# Gunakan user site (USERNAME.github.io) atau custom domain.
