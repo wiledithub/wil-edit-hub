@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050506">
+<title>Pengelola Konten | WIL EDIT HUB</title>
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/manager.css">
+</head>
+<body data-page="manager">
+<div class="mgr">
+
+  <!-- ===== Sidebar / navigasi bagian ===== -->
+  <aside class="side" aria-label="Navigasi Pengelola Konten">
+    <div class="side-brand">
+      <img src="assets/icons/favicon.svg" alt="" width="28" height="28">
+      <div><strong>WIL EDIT HUB</strong><small>Pengelola Konten (lokal)</small></div>
+    </div>
+    <nav class="side-nav" id="sideNav">
+      <a href="#sec-data" data-sec="sec-data"><i>◧</i><span>Data &amp; Ekspor</span></a>
+      <a href="#sec-list" data-sec="sec-list"><i>☰</i><span>Daftar Konten</span></a>
+      <span class="side-label">Form konten</span>
+      <a href="#sec-a" data-sec="sec-a"><i>A</i><span>Informasi Dasar</span></a>
+      <a href="#sec-b" data-sec="sec-b"><i>B</i><span>Media</span></a>
+      <a href="#sec-v" data-sec="sec-v" data-only="tutorial" hidden><i>&#9654;</i><span>Video Tutorial</span></a>
+      <a href="#sec-c" data-sec="sec-c" data-hide="tutorial"><i>C</i><span>Preview</span></a>
+      <a href="#sec-d" data-sec="sec-d" data-hide="tutorial"><i>D</i><span>Download</span></a>
+      <a href="#sec-e" data-sec="sec-e"><i>E</i><span id="secELinkText">Informasi File</span></a>
+    </nav>
+    <div class="side-foot">
+      <button class="btn js-new" type="button">+ Konten baru</button>
+      <a class="side-link" href="index.html">&larr; Kembali ke situs</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div>
+        <h1>Pengelola Konten</h1>
+        <p class="sub">Alat admin lokal. Jangan unggah halaman ini ke GitHub.</p>
+      </div>
+      <div class="badges">
+        <span class="badge" id="total">0 konten</span>
+        <span class="badge warn" id="dataBadge" hidden>Belum diekspor</span>
+        <span class="badge warn" id="formBadge" hidden>Form belum disimpan</span>
+      </div>
+    </header>
+
+    <p id="msg" class="msg" role="status" aria-live="polite"></p>
+
+    <!-- ===== Data & ekspor ===== -->
+    <section class="card" id="sec-data">
+      <h2 class="card-title">Data &amp; Ekspor</h2>
+      <div class="tools">
+        <button class="btn ghost" id="loadSite" type="button">Muat data/contents.json</button>
+        <label class="btn ghost file-btn">Impor JSON<input id="import" type="file" accept=".json,application/json" hidden></label>
+        <button class="btn" id="export" type="button">Ekspor contents.json</button>
+        <button class="btn" id="exportPackage" type="button">Ekspor Paket Website (.zip)</button>
+        <button class="btn ghost" id="exportSitemap" type="button">Ekspor sitemap.xml</button>
+      </div>
+      <p class="hint" id="packInfo"></p>
+      <details class="guide">
+        <summary>Alur kerja singkat</summary>
+        <ol>
+          <li>Jalankan server lokal: <code>python -m http.server 8000</code>, lalu buka <code>http://localhost:8000/content-manager.html</code>.</li>
+          <li>Tambah atau edit konten, lalu klik <strong>Simpan konten</strong>. Perubahan hanya ada di memori halaman ini.</li>
+          <li>Klik <strong>Ekspor Paket Website (.zip)</strong>. ZIP berisi <code>data/contents.json</code> dan gambar baru di <code>assets/images/</code>.</li>
+          <li>Ekstrak ZIP ke folder utama proyek (timpa file lama), lalu upload ke GitHub.</li>
+          <li>Untuk Linkvertise, tempel <em>Alamat halaman download</em> (bagian D) sebagai tujuan akhir.</li>
+        </ol>
+      </details>
+    </section>
+
+    <!-- ===== Daftar konten ===== -->
+    <section class="card" id="sec-list">
+      <div class="card-head">
+        <h2 class="card-title">Daftar Konten</h2>
+        <button class="btn js-new" type="button">+ Konten baru</button>
+      </div>
+      <div class="list-tools">
+        <input id="q" type="search" placeholder="Cari judul atau slug…" aria-label="Cari judul atau slug">
+        <select id="fstatus" aria-label="Filter status">
+          <option value="">Semua status</option>
+          <option value="draft">Draf</option>
+          <option value="published">Terbit</option>
+          <option value="archived">Arsip</option>
+        </select>
+      </div>
+      <p class="hint" id="count"></p>
+      <div id="rows" class="rows"></div>
+    </section>
+
+    <!-- ===== Form ===== -->
+    <form id="form" novalidate autocomplete="off">
+      <input type="hidden" name="id">
+      <div class="form-head">
+        <h2 id="formTitle">Konten baru</h2>
+      </div>
+
+      <!-- A. Informasi Dasar -->
+      <section class="card" id="sec-a">
+        <h3 class="card-title"><span class="step">A</span> Informasi Dasar</h3>
+        <div class="grid2">
+          <label class="full">Judul<input name="title" required></label>
+          <label>Slug (unik)<input name="slug" required placeholder="otomatis dari judul"></label>
+          <label>Tipe konten<select name="contentType"></select></label>
+          <label>Software<select name="software"></select></label>
+          <label>Kategori<input name="category" list="catList" placeholder="contoh: Transition"><datalist id="catList"></datalist></label>
+          <label data-only="tutorial" hidden>Level
+            <select name="level">
+              <option value="">Belum ditentukan</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </label>
+          <label>Status<select name="status"></select></label>
+          <label>Tanggal publikasi<input type="date" name="publishedAt"></label>
+          <label class="full">Tags (pisahkan dengan koma)<input name="tags" placeholder="alight motion, preset, xml"></label>
+          <label>Views awal (cadangan)<input type="number" min="0" name="views"></label>
+          <label class="check"><input type="checkbox" name="featured"> Unggulan</label>
+        </div>
+      </section>
+
+      <!-- B. Media -->
+      <section class="card" id="sec-b">
+        <h3 class="card-title"><span class="step">B</span> Media</h3>
+
+        <div class="media-block">
+          <h4>Thumbnail</h4>
+          <div class="thumb-row">
+            <div class="frame empty" id="thumbFrame">Belum ada thumbnail</div>
+            <div class="thumb-side">
+              <label>URL atau path thumbnail
+                <input name="thumbnail" placeholder="https://… atau assets/images/thumb.webp">
+              </label>
+              <div class="btn-row">
+                <label class="btn ghost file-btn"><span id="thumbPickText">Pilih dari komputer</span><input id="thumbFile" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
+                <button class="btn ghost danger" id="thumbDel" type="button" hidden>Hapus</button>
+              </div>
+              <p class="hint">JPG, PNG, atau WebP. Maksimal 5 MB per gambar.<span data-only="tutorial" hidden> Untuk tutorial, gambar otomatis diperkecil (maks. 1280 px) dan diubah ke WebP agar situs tetap ringan.</span></p>
+              <div class="btn-row" data-only="tutorial" hidden><button class="btn ghost" id="ytThumb" type="button" hidden>Pakai thumbnail YouTube</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="media-block" data-hide="tutorial">
+          <h4>Gambar preview &amp; galeri <small id="galCount"></small></h4>
+          <div class="gal" id="gal"></div>
+          <div class="btn-row">
+            <label class="btn ghost file-btn">Pilih gambar (bisa banyak)<input id="galFile" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+          </div>
+          <div class="url-row">
+            <input id="galUrl" type="text" placeholder="Tempel URL gambar, lalu Tambah" aria-label="URL gambar preview">
+            <button class="btn ghost" id="galAdd" type="button">Tambah URL</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Video Tutorial (hanya untuk tipe Tutorial) -->
+      <section class="card" id="sec-v" data-only="tutorial" hidden>
+        <h3 class="card-title"><span class="step">&#9654;</span> Video Tutorial</h3>
+        <p class="hint">Video tetap di YouTube atau TikTok. Situs hanya menyimpan link video dan thumbnail. Tidak ada upload MP4.</p>
+        <div class="grid2">
+          <label>Platform Video
+            <select name="videoPlatform">
+              <option value="youtube">YouTube</option>
+              <option value="tiktok">TikTok</option>
+            </select>
+          </label>
+          <label class="full">Link Video<input name="videoUrl" inputmode="url" placeholder="https://www.youtube.com/watch?v=VIDEO_ID atau https://youtu.be/VIDEO_ID"></label>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" id="videoTest" type="button" disabled>Tes Link Video &#8599;</button>
+          <span class="hint" id="videoStatus" role="status"></span>
+        </div>
+      </section>
+
+      <!-- C. Preview -->
+      <section class="card" id="sec-c" data-hide="tutorial">
+        <h3 class="card-title"><span class="step">C</span> Preview</h3>
+        <label>URL Preview (video atau halaman demo; kosongkan jika tidak ada)
+          <input name="previewUrl" placeholder="https://…">
+        </label>
+        <div class="btn-row">
+          <button class="btn ghost" id="previewTest" type="button" disabled>Tes Preview ↗</button>
+          <span class="hint" id="previewStatus"></span>
+        </div>
+      </section>
+
+      <!-- D. Download -->
+      <section class="card" id="sec-d" data-hide="tutorial">
+        <h3 class="card-title"><span class="step">D</span> Download</h3>
+        <p class="hint" id="dlHint">Isi link download 1. Link download 2 bersifat opsional.</p>
+        <div class="grid2">
+          <label>URL Download 1 (Linkvertise)<input name="downloadUrl" placeholder="https://…"></label>
+          <label>Nama tombol 1 (opsional)<input name="downloadLabel" placeholder="Unduh XML"></label>
+          <label>URL Download 2 (opsional)<input name="downloadUrl2" placeholder="https://…"></label>
+          <label>Nama tombol 2 (opsional)<input name="downloadLabel2" placeholder="Unduh 5MB"></label>
+          <label class="full">URL file utama (tujuan akhir; tampil di halaman download setelah iklan)<input name="fileUrl" placeholder="https://…"></label>
+        </div>
+        <div class="extra-box">
+          <strong>File tambahan (opsional)</strong>
+          <div id="extraRows"></div>
+          <button class="btn ghost" id="addExtra" type="button">+ Tambah file tambahan</button>
+        </div>
+        <div class="field">
+          <span>Alamat halaman download (isi sebagai tujuan akhir di Linkvertise)</span>
+          <div class="url-row">
+            <input id="dlPageUrl" readonly aria-label="Alamat halaman download">
+            <button class="btn ghost" id="copyDlPage" type="button">Salin</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- E. Informasi File -->
+      <section class="card" id="sec-e">
+        <h3 class="card-title"><span class="step">E</span> <span id="secETitle">Informasi File</span></h3>
+        <div class="grid2">
+          <label data-hide="tutorial">Format file<input name="fileFormat" placeholder="contoh: XML, ZIP, AEP"></label>
+          <label data-hide="tutorial">Ukuran file<input name="fileSize" placeholder="contoh: 5 MB"></label>
+          <label class="full">Deskripsi<textarea name="description"></textarea></label>
+        </div>
+      </section>
+
+      <div class="savebar">
+        <span class="hint" id="saveHint">Form kosong.</span>
+        <div class="btn-row">
+          <button class="btn ghost js-new" type="button">Konten baru</button>
+          <button class="btn" type="submit" id="save">Simpan konten</button>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/video.js"></script>
+<script src="assets/js/manager.js"></script>
+</body>
+</html>
