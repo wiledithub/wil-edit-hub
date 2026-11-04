@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://wiledithub.github.io/wil-edit-hub/sitemap.xml
