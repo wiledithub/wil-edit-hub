@@ -22,6 +22,36 @@
     return out;
   }
 
+  // ---- Tutorial: level + video (YouTube/TikTok) ----
+  var LEVELS = ["Beginner", "Intermediate", "Advanced"];
+  function levelOf(v) {
+    v = text(v).toLowerCase();
+    for (var i = 0; i < LEVELS.length; i++) if (LEVELS[i].toLowerCase() === v) return LEVELS[i];
+    return "";
+  }
+  // Mengisi x.level, x.videoPlatform, x.video ({ok, platform, id, watchUrl, embedUrl, canEmbed}) dan x.legacyLink.
+  // Kompatibel dengan tutorial lama: jika videoUrl kosong, dicari di embedUrl, url, previewUrl, downloadUrl.
+  function resolveTutorial(x) {
+    var V = window.WEH_VIDEO;
+    x.level = levelOf(x.level);
+    var cands = [x.videoUrl, x.embedUrl, x.url, x.previewUrl, x.downloadUrl, x.downloadUrl2];
+    var video = null;
+    if (V) {
+      for (var i = 0; i < cands.length && !video; i++) {
+        if (!text(cands[i])) continue;
+        var p = V.parse(cands[i]);
+        if (p.ok) video = p;
+      }
+    }
+    x.video = video;
+    x.videoPlatform = video ? video.platform : "";
+    x.videoUrl = video ? video.watchUrl : "";
+    x.legacyLink = "";
+    if (!video) {
+      [x.url, x.downloadUrl, x.previewUrl, x.downloadUrl2].some(function (u) { u = httpUrl(u); if (u) { x.legacyLink = u; return true; } return false; });
+    }
+  }
+
   async function load() {
     var r = await fetch("data/contents.json", { cache: "no-cache" });
     if (!r.ok) throw new Error("HTTP " + r.status);
@@ -41,8 +71,9 @@
       x.fileFormat = text(x.fileFormat);
       x.fileSize = text(x.fileSize);
       x.extraFiles = extraFiles(x.extraFiles);
+      if (x.contentType === "tutorial") resolveTutorial(x);
       x.totalViews = (Number(x.views) || 0) + (lv[x.id] || 0); return x;
     });
   }
-  window.WEH_CONTENT = { load: load, addView: addView, getViews: getViews };
+  window.WEH_CONTENT = { load: load, addView: addView, getViews: getViews, LEVELS: LEVELS };
 })();

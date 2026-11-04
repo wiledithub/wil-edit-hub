@@ -322,6 +322,143 @@
   }
 
   // ==========================================
+  // TUTORIAL: HALAMAN DETAIL (YouTube / TikTok)
+  // ==========================================
+  // Video tidak diunggah ke situs. Halaman hanya menyematkan (embed) video dari platform aslinya.
+  // Pemutar tidak pernah kosong: jika embed tidak tersedia atau gagal dimuat,
+  // tampil thumbnail + tombol "Tonton di ...".
+
+  var PLAT_NAME = { youtube: "YouTube", tiktok: "TikTok" };
+  var EMBED_TIMEOUT = 12000;
+
+  function renderTutorial(x, list, box, thumb) {
+    var v = x.video;                                  // null jika tidak ada link video yang valid
+    var plat = v ? v.platform : "";
+    var platName = PLAT_NAME[plat] || "";
+    var watchUrl = v ? v.watchUrl : x.legacyLink;     // tombol ke platform asli (atau tautan tutorial lama)
+    var watchLabel = v ? T(plat === "tiktok" ? "detail.watchTiktok" : "detail.watchYoutube") : T("detail.openTutorial");
+    var watchIcon = plat === "tiktok" ? ICONS.tiktok : plat === "youtube" ? ICONS.youtube : ICONS.preview;
+    var willEmbed = !!(v && v.canEmbed);
+    var published = U.fmt(x.publishedAt);
+
+    var rows = "";
+    if (x.software) rows += infoRow(T("detail.software"), esc(I.sw(x.software)));
+    if (x.category) rows += infoRow(T("detail.category"), esc(x.category));
+    if (x.level) rows += infoRow(T("detail.level"), esc(x.level));
+    if (platName) rows += infoRow(T("detail.platform"), esc(platName));
+    if (published) rows += infoRow(T("detail.date"), esc(published));
+
+    var tagsHtml = (x.tags || []).length
+      ? '<div class="info-tags"><span class="info-label">' + T("detail.tag") + '</span><p class="tags">' +
+        x.tags.map(function (t) { return '<a href="tutorials.html?q=' + encodeURIComponent(t) + '">#' + esc(t) + '</a>'; }).join("") +
+        '</p></div>'
+      : "";
+
+    var badges = '<span class="badge">' + esc(I.sw(x.software)) + '</span>' +
+      (x.level ? ' <span class="badge lvl lvl-' + esc(x.level.toLowerCase()) + '">' + esc(x.level) + '</span>' : "") +
+      (plat ? ' <span class="badge plat-badge plat-' + plat + '">' + esc(platName) + '</span>' : "");
+
+    var poster = thumb
+      ? '<img class="player-poster" src="' + esc(thumb) + '" alt="' + esc(x.title) + '" decoding="async" onerror="this.remove()">'
+      : '<div class="player-ph">' + esc(I.sw(x.software)) + '</div>';
+
+    var fbText = v ? T("detail.videoFallback") : (x.legacyLink ? "" : T("detail.videoNone"));
+    var fbButton = watchUrl
+      ? '<a class="btn big" href="' + esc(watchUrl) + '" target="_blank" rel="noopener noreferrer">' + watchIcon + '<span>' + esc(watchLabel) + '</span></a>'
+      : "";
+    // Tombol di bawah pemutar selalu ada (video yang dibatasi pemilik atau embed bermasalah tetap bisa dibuka).
+    var belowButton = (willEmbed && watchUrl)
+      ? '<div class="player-actions"><a class="btn big btn-preview" href="' + esc(watchUrl) + '" target="_blank" rel="noopener noreferrer">' + watchIcon + '<span>' + esc(watchLabel) + '</span></a></div>'
+      : "";
+
+    var descParas = descriptionParagraphs(x.description);
+
+    box.innerHTML =
+      '<nav class="crumbs"><a href="index.html">' + T("nav.home") + '</a> / <a href="tutorials.html">' + T("nav.tutorials") + '</a></nav>' +
+      '<div class="detail-grid tut-detail">' +
+        '<div class="player-col">' +
+          '<div class="player ' + (plat ? "player-" + plat : "player-none") + '" id="player" role="region" aria-label="' + esc(T("detail.player")) + '">' +
+            poster +
+            '<div class="player-frame" id="player-frame"></div>' +
+            '<div class="player-fallback" id="player-fb"' + (willEmbed ? " hidden" : "") + '>' +
+              '<span class="play play-lg" aria-hidden="true">' + (window.WEH_UTIL.PLAY || "") + '</span>' +
+              (fbText ? '<p>' + esc(fbText) + '</p>' : "") + fbButton +
+            '</div>' +
+          '</div>' +
+          belowButton +
+        '</div>' +
+        '<div class="info">' +
+          '<div class="badges">' + badges + '</div>' +
+          '<h1>' + esc(x.title) + '</h1>' +
+          '<div class="stats stats-one"><div class="stat"><span class="stat-label">' + T("detail.views") + '</span>' +
+            '<strong class="stat-val" id="global-views">' + T("detail.loading") + '</strong></div></div>' +
+          '<div class="info-panel" role="group" aria-labelledby="info-title">' +
+            '<h2 class="panel-title" id="info-title">' + T("detail.infoTutorial") + '</h2>' +
+            '<dl class="info-grid">' + rows + '</dl>' + tagsHtml +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ad-slot" data-slot="inContent" hidden></div>' +
+      '<section class="prose"><h2>' + T("detail.description") + '</h2>' +
+        (descParas.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") || "<p>" + T("detail.noDescription") + "</p>") +
+      '</section>' +
+      creatorSection() +
+      '<section><div class="sec-head"><h2>' + T("detail.related") + '</h2></div><div class="grid tut-grid" id="related"></div></section>';
+
+    // ---- Pemutar ----
+    var player = document.getElementById("player");
+    var fb = document.getElementById("player-fb");
+    var frame = document.getElementById("player-frame");
+
+    function showFallback() {
+      if (fb) fb.hidden = false;
+      if (player) player.classList.add("is-fallback");
+    }
+
+    if (willEmbed && frame) {
+      var ifr = document.createElement("iframe");
+      var loaded = false;
+      ifr.title = x.title;
+      ifr.src = v.embedUrl;
+      ifr.setAttribute("allowfullscreen", "");
+      ifr.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+      ifr.setAttribute("allow", plat === "youtube"
+        ? "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+        : "fullscreen; encrypted-media; picture-in-picture");
+      ifr.addEventListener("load", function () {
+        loaded = true;
+        if (fb) fb.hidden = true;
+        if (player) { player.classList.remove("is-fallback"); player.classList.add("is-ready"); }
+      });
+      ifr.addEventListener("error", showFallback);
+      frame.appendChild(ifr);
+      if (navigator.onLine === false) showFallback();
+      else setTimeout(function () { if (!loaded) showFallback(); }, EMBED_TIMEOUT);
+    }
+
+    // ---- Views (Supabase, sama seperti preset) ----
+    getGlobalStats(x.slug).then(function (stats) {
+      var el = document.getElementById("global-views");
+      if (el) el.textContent = Number(stats.views || 0).toLocaleString(I.locale()) + "x";
+    }).catch(function (error) {
+      console.error("Statistik Supabase:", error);
+      var el = document.getElementById("global-views");
+      if (el) el.textContent = T("detail.unavailable");
+    });
+
+    // ---- Tutorial terkait ----
+    var rel = list.filter(function (o) {
+      return o.id !== x.id && o.contentType === "tutorial" &&
+        (o.software === x.software || (o.tags || []).some(function (t) { return (x.tags || []).indexOf(t) > -1; }));
+    }).slice(0, 4);
+    document.getElementById("related").innerHTML = rel.length
+      ? rel.map(U.card).join("")
+      : '<p class="empty">' + T("detail.noRelated") + '</p>';
+
+    if (window.WEH_ADS) window.WEH_ADS();
+  }
+
+  // ==========================================
   // RENDER HALAMAN DETAIL
   // ==========================================
 
@@ -378,6 +515,9 @@
     });
 
     var isTut = x.contentType === "tutorial";
+
+    // Tutorial video (YouTube/TikTok) punya tampilan sendiri; preset dan lainnya tidak berubah.
+    if (isTut) return renderTutorial(x, list, box, thumb);
 
     // ========================================
     // HTML DETAIL

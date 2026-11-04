@@ -179,3 +179,53 @@ article.prose h2{margin:1.6em 0 .5em}
 .actions .btn,.actions .dl-btn{width:100%;min-width:0;flex:none;padding-left:18px;padding-right:18px;overflow-wrap:anywhere}
 @media (max-width:560px){.actions{grid-template-columns:1fr}}
 .hero-img,.strip,.detail-grid{max-width:100%}
+
+/* ===== Tutorial (YouTube / TikTok) ===== */
+.filters-tut{grid-template-columns:2fr 1fr 1fr 1fr 1fr}
+.tut-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.tut-card .thumb{aspect-ratio:16/9}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(5,5,6,.62);color:#fff;border:1.5px solid rgba(255,255,255,.7);backdrop-filter:blur(4px);transition:background .2s,transform .2s;pointer-events:none}
+.play svg{margin-left:3px}
+.tut-card:hover .play{background:var(--accent);border-color:var(--accent);color:#09050f;transform:translate(-50%,-50%) scale(1.08)}
+.plat{position:absolute;left:10px;top:10px;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.02em;color:#fff;background:rgba(5,5,6,.72);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(4px)}
+.plat-youtube{background:rgba(204,24,24,.88);border-color:transparent}
+.plat-tiktok{background:rgba(5,5,6,.82);border-color:#25f4ee;box-shadow:1.5px 1.5px 0 #fe2c55}
+.tdesc{color:var(--muted);font-size:.88rem;line-height:1.45;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.78rem;color:var(--muted);line-height:1.5;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.lvl,.badge.lvl{font-weight:600}
+.lvl-beginner{color:#7ee2a8;border-color:rgba(126,226,168,.4)}
+.lvl-intermediate{color:#ffd37a;border-color:rgba(255,211,122,.4)}
+.lvl-advanced{color:#ff9aa8;border-color:rgba(255,154,168,.4)}
+.badge.lvl-beginner{background:rgba(126,226,168,.12)}
+.badge.lvl-intermediate{background:rgba(255,211,122,.12)}
+.badge.lvl-advanced{background:rgba(255,154,168,.12)}
+.badge.plat-badge{color:#fff}
+.badge.plat-youtube{background:rgba(204,24,24,.7)}
+.badge.plat-tiktok{background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px #25f4ee}
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.card-body .tmeta{padding-top:2px}
+
+/* Halaman detail tutorial */
+.tut-detail{align-items:start}
+.player-col{min-width:0;display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.player{position:relative;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;isolation:isolate}
+.player-youtube,.player-none{aspect-ratio:16/9}
+.player-tiktok{aspect-ratio:325/739;max-width:340px;margin:0 auto}
+.player-poster,.player-ph,.player-frame,.player-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.player-poster{object-fit:cover;filter:brightness(.7)}
+.player-ph{display:grid;place-items:center;color:var(--muted);font-weight:700}
+.player-frame{z-index:1}
+.player-fallback{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center;background:rgba(5,5,6,.72);backdrop-filter:blur(3px)}
+.player-fallback[hidden]{display:none}
+.player-fallback p{margin:0;color:#d3d1dc;max-width:34ch}
+.player-fallback .play{position:static;transform:none;width:60px;height:60px}
+.player-fallback .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px}
+.player-actions{display:flex}.player-actions .btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.player-tiktok+.player-actions{max-width:340px;margin:0 auto;width:100%}
+.stats-one{grid-template-columns:1fr}
+@media (max-width:1000px){.filters-tut{grid-template-columns:1fr 1fr 1fr}.filters-tut input{grid-column:1/-1}}
+@media (max-width:560px){.tut-grid{grid-template-columns:1fr}}
+
+/* Atribut hidden harus menang atas display bawaan tombol (mis. "Muat lebih banyak" tampil saat tidak diperlukan). */
+[hidden]{display:none!important}

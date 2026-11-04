@@ -22,3 +22,6 @@
   .dl-thumb{flex-basis:auto;width:100%;max-width:240px}
 }
 @media (max-width:380px){.info-grid{grid-template-columns:1fr}}
+
+@media (max-width:900px){.filters-tut{grid-template-columns:1fr 1fr}.filters-tut input{grid-column:1/-1}}
+@media (max-width:560px){.filters-tut{grid-template-columns:1fr}.tut-grid{grid-template-columns:1fr}.player-tiktok{max-width:100%}}
