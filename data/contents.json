@@ -622,10 +622,8 @@
         "preset",
         "xml"
       ],
-      "downloadUrl": "https://direct-link.net/1235108/kinAg2XSnlKc",
-      "downloadLabel": "XML (16:9)",
-      "downloadUrl2": "https://link-hub.net/1235108/h7v6kOxlWMtI",
-      "downloadLabel2": "XML (9:16)",
+      "downloadUrl": "https://link-hub.net/1235108/h7v6kOxlWMtI",
+      "downloadLabel": "XML (9:16)",
       "contentType": "preset",
       "publishedAt": "2022-08-11",
       "status": "published",
@@ -634,10 +632,11 @@
       "previewUrl": "https://www.tiktok.com/@its_me_wil23/video/7130453021091220763?is_from_webapp=1&sender_device=pc",
       "fileFormat": "XML",
       "fileUrl": "https://link-center.net/1235108/Yu9W9B3ouzOi",
-      "extraFiles": [
+      "aspectRatioDownloads": [
         {
-          "name": "XML (1:1)",
-          "url": "https://link-center.net/1235108/Yu9W9B3ouzOi"
+          "ratio": "16:9",
+          "label": "XML",
+          "downloadUrl": "https://direct-link.net/1235108/kinAg2XSnlKc"
         }
       ]
     }
