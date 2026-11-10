@@ -63,9 +63,11 @@ Tombol **Download** (satu atau dua link) dan **Preview** (hanya tampil jika `pre
 - Setiap konten punya `downloadUrl` dan `downloadUrl2` (opsional), nama tombol lewat `downloadLabel` / `downloadLabel2`. Bawaan: Alight Motion **Unduh XML** / **Unduh 5MB**; After Effects **Unduh Project File** / **Unduh Bahan**; CapCut satu tombol **Unduh**.
 - `fileUrl` dan `extraFiles` tampil di `download.html` (tujuan akhir Linkvertise).
 
-## Pilihan ukuran preset (aspect ratio) dengan link download per ukuran
-- Field opsional `aspectRatioDownloads` di `contents.json`: `[{ "ratio": "9:16", "label": "Vertical", "downloadUrl": "https://..." }]`. `label` opsional; `ratio` dan `downloadUrl` wajib untuk setiap ukuran. Tidak ada batas jumlah.
-- Pengelola Konten, bagian **F. Pilihan Ukuran Preset**: pintasan (9:16, 1:1, 16:9, 4:5, 3:4, 4:3) atau **+ Tambah Ukuran** untuk ukuran bebas. Tombol **Hapus** menghapus satu ukuran; baris kosong diabaikan.
-- Halaman detail menampilkan **Pilih Ukuran Preset** hanya jika ada ukuran. Setiap tombol Download membuka link ukurannya sendiri dan mencatat satu download seperti tombol biasa.
-- Jika ukuran diisi dan Link Download 1/2 dikosongkan, tombol download umum tidak ditampilkan. Jika keduanya diisi, keduanya tampil.
-- Untuk Linkvertise, atur tujuan akhir link tiap ukuran ke file ukuran tersebut (halaman download hanya menampilkan satu file utama).
+## Download berdasarkan ukuran (aspect ratio)
+Semua pengaturan download ada di satu bagian: **D. Download** di Pengelola Konten.
+- Download standar tetap sama: URL Download 1 / 2 (`downloadUrl`, `downloadUrl2`, mis. XML dan 5MB), URL file utama `fileUrl` (tujuan akhir Linkvertise), dan `extraFiles`.
+- Di bawahnya ada **Pilihan Download Berdasarkan Ukuran** dengan tombol **+ Tambah Link Download**. Setiap pilihan punya rasio (mis. 9:16), nama (mis. Vertical), URL, dan tombol **Hapus**. Tidak ada batas jumlah; baris kosong diabaikan.
+- Data disimpan di `contents.json` sebagai `aspectRatioDownloads`: `[{ "ratio": "9:16", "label": "Vertical", "downloadUrl": "https://..." }]`. Field lama tidak diubah, jadi data lama tetap terbaca dan tidak perlu dimigrasi.
+- Halaman detail menampilkan satu daftar **Download Preset**: tombol XML, 5MB, lalu satu tombol per ukuran ("Unduh 9:16 (Vertical)"). Ukuran tanpa rasio atau URL http(s) valid tidak ditampilkan.
+- Semua tombol memakai handler dan pencatatan download Supabase yang sama.
+- Untuk Linkvertise, atur tujuan akhir link tiap ukuran ke file ukuran tersebut (halaman download.html menampilkan `fileUrl` dan `extraFiles`).
