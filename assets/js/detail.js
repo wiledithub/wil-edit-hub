@@ -288,6 +288,9 @@
     "Other": [null, "dl.materials"]
   };
 
+  // Semua tombol download dalam SATU daftar: link lama (downloadUrl / downloadUrl2, mis. XML dan 5MB)
+  // lalu pilihan ukuran (aspectRatioDownloads). Semuanya memakai handler .dl-btn yang sama,
+  // sehingga pencatatan download Supabase tidak berubah.
   function downloadLinks(x, isTut) {
     var u1 = httpUrl(x.downloadUrl);
     var u2 = httpUrl(x.downloadUrl2);
@@ -305,10 +308,18 @@
       list.push({ url: u1, label: c1 || single });
     } else if (u2) {
       list.push({ url: u2, label: c2 || single });
-    } else {
-      // Belum ada link: tombol tetap tampil dan memberi tahu pengunjung.
-      list.push({ url: "", label: single });
     }
+
+    // Pilihan ukuran: hanya yang punya rasio dan URL valid (content.js sudah menyaring).
+    var sizes = isTut ? [] : (x.aspectRatioDownloads || []);
+    sizes.forEach(function (r) {
+      var url = httpUrl(r.downloadUrl);
+      if (!r.ratio || !url) return;
+      list.push({ url: url, label: T("dl.size", { r: r.ratio + (r.label ? " (" + r.label + ")" : "") }) });
+    });
+
+    // Belum ada satu pun link: tombol tetap tampil dan memberi tahu pengunjung (perilaku lama).
+    if (!list.length) list.push({ url: "", label: single });
 
     var buttons = list.map(function (d, i) {
       return '<button class="btn big dl-btn' + (i > 0 ? " dl-btn-2" : "") + '" type="button" data-url="' +
@@ -318,7 +329,7 @@
     // Penjelasan singkat perbedaan XML dan 5MB, hanya untuk Alight Motion dengan nama tombol bawaan.
     var hint = (both && x.software === "Alight Motion" && !c1 && !c2) ? T("dl.amHint") : "";
 
-    return { buttons: buttons, hint: hint };
+    return { buttons: buttons, hint: hint, count: list.length };
   }
 
   // ==========================================
@@ -594,15 +605,19 @@
 
           '<h1>' + esc(x.title) + '</h1>' +
 
-          '<div class="actions">' +
-            dlButtons +
-            (previewUrl
-              ? '<a class="btn big btn-preview" id="preview" href="' +
+          '<section class="dl-options" aria-labelledby="dl-options-title">' +
+            '<h2 class="panel-title" id="dl-options-title">' + T("detail.dlTitle") + '</h2>' +
+            '<div class="actions">' + dlButtons + '</div>' +
+          '</section>' +
+
+          (previewUrl
+            ? '<div class="actions actions-preview">' +
+                '<a class="btn big btn-preview" id="preview" href="' +
                   esc(previewUrl) + '" target="_blank" rel="noopener noreferrer">' +
-                  ICONS.preview + '<span>' + T("detail.preview") + '</span></a>'
-              : ""
-            ) +
-          '</div>' +
+                  ICONS.preview + '<span>' + T("detail.preview") + '</span></a>' +
+              '</div>'
+            : ""
+          ) +
 
           (dlHint ? '<p class="hint dl-hint">' + esc(dlHint) + '</p>' : "") +
 

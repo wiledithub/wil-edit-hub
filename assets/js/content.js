@@ -22,6 +22,20 @@
     return out;
   }
 
+  // Pilihan ukuran preset: [{ ratio, label, downloadUrl }]. Hanya entri dengan ukuran dan link http(s) yang valid dipakai.
+  // Konten lama tanpa field ini menghasilkan array kosong, sehingga bagian pilihan ukuran tidak tampil.
+  function ratioDownloads(list) {
+    var out = [];
+    if (!Array.isArray(list)) return out;
+    list.forEach(function (e) {
+      if (!e || typeof e !== "object") return;
+      var ratio = text(e.ratio).replace(/\s+/g, " ").replace(/\s*:\s*/g, ":"), url = httpUrl(e.downloadUrl);
+      if (!ratio || !url) return;
+      out.push({ ratio: ratio, label: text(e.label).replace(/\s+/g, " "), downloadUrl: url });
+    });
+    return out;
+  }
+
   // ---- Tutorial: level + video (YouTube/TikTok) ----
   var LEVELS = ["Beginner", "Intermediate", "Advanced"];
   function levelOf(v) {
@@ -71,6 +85,7 @@
       x.fileFormat = text(x.fileFormat);
       x.fileSize = text(x.fileSize);
       x.extraFiles = extraFiles(x.extraFiles);
+      x.aspectRatioDownloads = ratioDownloads(x.aspectRatioDownloads);
       if (x.contentType === "tutorial") resolveTutorial(x);
       x.totalViews = (Number(x.views) || 0) + (lv[x.id] || 0); return x;
     });
