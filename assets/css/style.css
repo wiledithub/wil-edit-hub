@@ -229,3 +229,9 @@ article.prose h2{margin:1.6em 0 .5em}
 
 /* Atribut hidden harus menang atas display bawaan tombol (mis. "Muat lebih banyak" tampil saat tidak diperlukan). */
 [hidden]{display:none!important}
+
+/* Download Preset: semua tombol (XML, 5MB, dan pilihan ukuran) dalam satu daftar */
+.dl-options{margin:18px 0 0}
+.dl-options .panel-title{margin:0 0 10px}
+.dl-options .actions{margin:0}
+.actions-preview{margin:12px 0 0}
