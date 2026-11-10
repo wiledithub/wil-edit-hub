@@ -62,3 +62,10 @@ Tombol **Download** (satu atau dua link) dan **Preview** (hanya tampil jika `pre
 - Bahasa ID/EN lewat tombol di menu (`assets/js/i18n.js`); Pengelola Konten hanya berbahasa Indonesia.
 - Setiap konten punya `downloadUrl` dan `downloadUrl2` (opsional), nama tombol lewat `downloadLabel` / `downloadLabel2`. Bawaan: Alight Motion **Unduh XML** / **Unduh 5MB**; After Effects **Unduh Project File** / **Unduh Bahan**; CapCut satu tombol **Unduh**.
 - `fileUrl` dan `extraFiles` tampil di `download.html` (tujuan akhir Linkvertise).
+
+## Pilihan ukuran preset (aspect ratio) dengan link download per ukuran
+- Field opsional `aspectRatioDownloads` di `contents.json`: `[{ "ratio": "9:16", "label": "Vertical", "downloadUrl": "https://..." }]`. `label` opsional; `ratio` dan `downloadUrl` wajib untuk setiap ukuran. Tidak ada batas jumlah.
+- Pengelola Konten, bagian **F. Pilihan Ukuran Preset**: pintasan (9:16, 1:1, 16:9, 4:5, 3:4, 4:3) atau **+ Tambah Ukuran** untuk ukuran bebas. Tombol **Hapus** menghapus satu ukuran; baris kosong diabaikan.
+- Halaman detail menampilkan **Pilih Ukuran Preset** hanya jika ada ukuran. Setiap tombol Download membuka link ukurannya sendiri dan mencatat satu download seperti tombol biasa.
+- Jika ukuran diisi dan Link Download 1/2 dikosongkan, tombol download umum tidak ditampilkan. Jika keduanya diisi, keduanya tampil.
+- Untuk Linkvertise, atur tujuan akhir link tiap ukuran ke file ukuran tersebut (halaman download hanya menampilkan satu file utama).
